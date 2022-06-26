@@ -3,7 +3,7 @@ package com.aamirbakhtiar.multiple_providers.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name ="otps")
+@Table(name = "otps")
 public class Otp {
 
     @Id

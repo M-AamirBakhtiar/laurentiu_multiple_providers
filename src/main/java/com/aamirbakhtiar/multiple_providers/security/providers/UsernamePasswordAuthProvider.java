@@ -31,7 +31,7 @@ public class UsernamePasswordAuthProvider implements AuthenticationProvider {
 
         UserDetails user = customUserDetailsService.loadUserByUsername(username);
 
-        if(passwordEncoder.matches(password, user.getPassword())) {
+        if (passwordEncoder.matches(password, user.getPassword())) {
             return new UsernamePasswordAuthentication(username, password, user.getAuthorities());
         }
 

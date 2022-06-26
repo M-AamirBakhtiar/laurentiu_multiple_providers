@@ -28,7 +28,7 @@ public class OtpAuthProvider implements AuthenticationProvider {
 
         var o = otpRepository.findOtpByUsername(username);
 
-        if(o.isPresent()) {
+        if (o.isPresent()) {
             return new OtpAuthentication(username, otp, List.of(() -> "read"));
         }
 

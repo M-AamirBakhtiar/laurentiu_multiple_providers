@@ -1,6 +1,5 @@
 package com.aamirbakhtiar.multiple_providers.entity;
 
-import javax.annotation.processing.Generated;
 import javax.persistence.*;
 
 @Entity
