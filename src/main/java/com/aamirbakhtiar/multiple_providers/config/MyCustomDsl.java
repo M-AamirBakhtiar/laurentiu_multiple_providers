@@ -1,8 +1,11 @@
 package com.aamirbakhtiar.multiple_providers.config;
 
 import com.aamirbakhtiar.multiple_providers.repository.OtpRepository;
+import com.aamirbakhtiar.multiple_providers.security.filters.TokenAuthFilter;
 import com.aamirbakhtiar.multiple_providers.security.filters.UsernamePasswordAuthFilter;
+import com.aamirbakhtiar.multiple_providers.security.managers.TokenManager;
 import com.aamirbakhtiar.multiple_providers.security.providers.OtpAuthProvider;
+import com.aamirbakhtiar.multiple_providers.security.providers.TokenAuthProvider;
 import com.aamirbakhtiar.multiple_providers.security.providers.UsernamePasswordAuthProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,12 +26,20 @@ public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurit
 
         UsernamePasswordAuthProvider usernamePasswordAuthProvider = context.getBean(UsernamePasswordAuthProvider.class);
         OtpAuthProvider otpAuthProvider = context.getBean(OtpAuthProvider.class);
+        TokenAuthProvider tokenAuthProvider = context.getBean(TokenAuthProvider.class);
+
         OtpRepository otpRepository = context.getBean(OtpRepository.class);
+        TokenManager tokenManager = context.getBean(TokenManager.class);
 
         AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
 
-        http.authenticationProvider(usernamePasswordAuthProvider).authenticationProvider(otpAuthProvider);
+        http
+                .authenticationProvider(usernamePasswordAuthProvider)
+                .authenticationProvider(otpAuthProvider)
+                .authenticationProvider(tokenAuthProvider);
 
-        http.addFilterAt(new UsernamePasswordAuthFilter(authenticationManager, otpRepository), BasicAuthenticationFilter.class);
+        http
+                .addFilterAt(new UsernamePasswordAuthFilter(authenticationManager, otpRepository, tokenManager), BasicAuthenticationFilter.class)
+                .addFilterAfter(new TokenAuthFilter(authenticationManager), BasicAuthenticationFilter.class);
     }
 }

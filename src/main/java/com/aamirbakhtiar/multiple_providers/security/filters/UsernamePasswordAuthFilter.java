@@ -4,6 +4,7 @@ import com.aamirbakhtiar.multiple_providers.entity.Otp;
 import com.aamirbakhtiar.multiple_providers.repository.OtpRepository;
 import com.aamirbakhtiar.multiple_providers.security.authentications.OtpAuthentication;
 import com.aamirbakhtiar.multiple_providers.security.authentications.UsernamePasswordAuthentication;
+import com.aamirbakhtiar.multiple_providers.security.managers.TokenManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,10 +22,12 @@ public class UsernamePasswordAuthFilter extends OncePerRequestFilter {
 
     private final AuthenticationManager authenticationManager;
     private final OtpRepository otpRepository;
+    private final TokenManager tokenManager;
 
-    public UsernamePasswordAuthFilter(AuthenticationManager authenticationManager, OtpRepository otpRepository) {
+    public UsernamePasswordAuthFilter(AuthenticationManager authenticationManager, OtpRepository otpRepository, TokenManager tokenManager) {
         this.authenticationManager = authenticationManager;
         this.otpRepository = otpRepository;
+        this.tokenManager = tokenManager;
     }
 
 
@@ -44,8 +47,14 @@ public class UsernamePasswordAuthFilter extends OncePerRequestFilter {
 
             a = authenticationManager.authenticate(a);
 
-            // generate a token
-            response.setHeader("Authorization", UUID.randomUUID().toString());
+            // We Issue a token
+            var token = UUID.randomUUID().toString();
+
+            // store the generated token
+            tokenManager.add(token);
+
+            // send the token in the header to be used with future request from client
+            response.setHeader("Authorization", token);
 
         } else {
             // step 1
